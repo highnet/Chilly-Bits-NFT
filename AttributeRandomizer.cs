@@ -17,6 +17,8 @@ public class AttributeRandomizer : MonoBehaviour
     int rare_Threshold = 600000;
     int epic_Threshold = 800000;
     int legendaryThreshold = 10000000;
+    public int cardSetsAmount = 1;
+    int cardSetCounter = 0;
     public List<GameObject> hats_uncommon;
     public List<GameObject> hats_common;
     public List<GameObject> hats_rare;
@@ -48,6 +50,8 @@ public class AttributeRandomizer : MonoBehaviour
     public List<GameObject> accesories_rare;
     public List<GameObject> accesories_epic;
     public List<GameObject> accesories_legendary;
+    public List<GameObject> playingCards;
+    public Queue<GameObject> cardStack;
     public List<Material> colors_uncommon;
     public List<Material> colors_common;
     public List<Material> colors_rare;
@@ -61,6 +65,7 @@ public class AttributeRandomizer : MonoBehaviour
     public GameObject floor;
     public Camera renderCam;
     int renderNumber;
+    int startingRenderNumber;
     public GameObject body;
     public GameObject belly;
     public GameObject visor;
@@ -77,11 +82,15 @@ public class AttributeRandomizer : MonoBehaviour
         csvStringBuilder = new StringBuilder();
         batchJobAmount = 0;
         renderNumber = 0;
+        cardSetCounter = 0;
+        cardStack = new Queue<GameObject>();
+        startingRenderNumber = 0;
+
+        RebuildCardStack();
+
         Randomize();
         renderedPingu = new Hashtable();
         uiGameobject.SetActive(true);
-
-
     }
 
     public void ExportPinguToCsvBuffer()
@@ -104,7 +113,13 @@ public class AttributeRandomizer : MonoBehaviour
 
     public void BatchRender()
     {
-        renderNumber = 0;
+        renderNumber = startingRenderNumber;
+        cardSetCounter = 0;
+        csvStringBuilder = new StringBuilder();
+        cardStack = new Queue<GameObject>();
+        RebuildCardStack();
+
+        renderedPingu = new Hashtable();
         StartCoroutine("BatchRenderAction");
 
     }
@@ -138,7 +153,7 @@ public class AttributeRandomizer : MonoBehaviour
             var imageBytes = cameraImage.EncodeToPNG();
             Destroy(cameraImage);
 
-            File.WriteAllBytes(Application.dataPath + "/renders/" + keyString + ".png", imageBytes);
+            File.WriteAllBytes(Application.dataPath + "/renders/" + renderNumber + "_"  + keyString + ".png", imageBytes);
             renderCam.targetTexture = null;
 
             Destroy(outputMapTexture);
@@ -200,7 +215,6 @@ public class AttributeRandomizer : MonoBehaviour
 
         }
 
-
     }
 
     private void RandomizeFullscreenShader()
@@ -210,9 +224,6 @@ public class AttributeRandomizer : MonoBehaviour
         fullScreenShaderTex.GetComponent<Renderer>().material = fullScreenShaders[fullScreenShaderSeed];
 
         mainCharacter.appliedFullScreenShader = fullScreenShaders[fullScreenShaderSeed].name;
-
-
-        
     }
 
     private void ClearAttributes()
@@ -337,6 +348,11 @@ public class AttributeRandomizer : MonoBehaviour
         {
             go.SetActive(false);
         }
+        foreach (GameObject go in playingCards)
+        {
+            go.SetActive(false);
+        }
+
         mainCharacter.hat = "";
         mainCharacter.weapon = "";
         mainCharacter.wallColor = "";
@@ -469,35 +485,93 @@ public class AttributeRandomizer : MonoBehaviour
 
     }
 
+    public void ReplaceWeaponWithCard()
+    {
+        foreach (GameObject go in weapons_common)
+        {
+            go.SetActive(false);
+        }
+        foreach (GameObject go in weapons_uncommon)
+        {
+            go.SetActive(false);
+        }
+        foreach (GameObject go in weapons_rare)
+        {
+            go.SetActive(false);
+        }
+        foreach (GameObject go in weapons_epic)
+        {
+            go.SetActive(false);
+        }
+        foreach (GameObject go in weapons_legendary)
+        {
+            go.SetActive(false);
+        }
+
+        mainCharacter.weapon = "";
+
+        if(cardStack.Count == 0) 
+        {
+            RebuildCardStack();
+            cardSetCounter++;
+        }
+
+        GameObject drawnCard = cardStack.Dequeue();
+        drawnCard.SetActive(true);
+
+        mainCharacter.setAttributeReference("weapon", drawnCard.name);
+
+    }
+
+    public void RebuildCardStack()
+    {
+        foreach (GameObject go in playingCards)
+        {
+            cardStack.Enqueue(go);
+        }
+    }
+
     public void UpdateBatchJobAmountWithUI()
     {
 
         string inputString = batchAmountInput.text;
         int.TryParse(inputString, out batchJobAmount);
 
-        if (batchJobAmount > 100) 
+        if (batchJobAmount >200) 
         {
-            Debug.Log("SAFETY MODE ON !!!");
-            Debug.LogWarning("to render more than 100 objects turn safety mode off in code");
+          //  Debug.Log("SAFETY MODE ON !!!");
+          //  Debug.LogWarning("to render more than 200 objects turn safety mode off in code");
 
-            batchJobAmount = 100;
+           // batchJobAmount = 200;
         }
+    }
+
+
+    public void UpdateBatchStartRenderNumberWithUI()
+    {
+        string inputString = batchAmountInput.text;
+        int.TryParse(inputString, out startingRenderNumber); 
     }
 
     IEnumerator BatchRenderAction()
     {
+        int cardInsertIndex = batchJobAmount / 52;
 
         uiGameobject.SetActive(false);
         csvStringBuilder.Clear();
         csvStringBuilder = new StringBuilder("render, hat, weapon, wallcolor, floorcolor, eyeball, beak, eyebrow, accesory, bodycolor, visorcolor, bellycolor, fullscreenshader");
-        Randomize();
         for (int i = 0; i < batchJobAmount; i++)
         {
             ExportPinguToCsvBuffer();
             RenderCamera();
             Randomize();
 
-            yield return new WaitForSeconds(0.5f);
+            if(cardSetCounter < cardSetsAmount)
+            {
+                ReplaceWeaponWithCard();
+            }
+
+            yield return new WaitForSeconds(0.1f);
         }
 
 
