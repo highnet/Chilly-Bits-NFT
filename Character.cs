@@ -75,6 +75,12 @@ public class Character : MonoBehaviour
                     bellyColor = name;
                 }
                 break;
+            case "appliedFullScreenShader":
+                {
+                    appliedFullScreenShader = name;
+                }
+                break;
+
         }
     }
 }

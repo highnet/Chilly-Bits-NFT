@@ -58,7 +58,17 @@ public class AttributeRandomizer : MonoBehaviour
     public List<Material> colors_rare;
     public List<Material> colors_epic;
     public List<Material> colors_legendary;
-    public List<Material> fullScreenShaders;
+
+    public List<Material> fullScreenShaders_common;
+    public List<Material> fullScreenShaders_uncommon;
+    public List<Material> fullScreenShaders_rare;
+    public List<Material> fullScreenShaders_epic;
+    public List<Material> fullScreenShaders_legendary;
+
+
+
+
+
     public Character mainCharacter;
     public GameObject camRenderTex;
     public GameObject fullScreenShaderTex;
@@ -142,7 +152,7 @@ public class AttributeRandomizer : MonoBehaviour
         {
             renderedPingu.Add(renderNumber, keyString);
 
-            RenderTexture outputMapTexture = new RenderTexture(1920, 1080, 32);
+            RenderTexture outputMapTexture = new RenderTexture(800, 800, 32);
 
             outputMapTexture.name = "RT" + renderNumber;
 
@@ -185,6 +195,7 @@ public class AttributeRandomizer : MonoBehaviour
         RandomizeMaterial("bodycolor", body, colors_common, colors_uncommon, colors_rare, colors_epic, colors_legendary);
         RandomizeMaterial("visorcolor", visor, colors_common, colors_uncommon, colors_rare, colors_epic, colors_legendary);
         RandomizeMaterial("bellycolor", belly, colors_common, colors_uncommon, colors_rare, colors_epic, colors_legendary);
+      
         int randomNumberOfAttributes = UnityEngine.Random.Range(0, 4);
 
         List<String> possibleAttributes = new List<string>
@@ -220,19 +231,9 @@ public class AttributeRandomizer : MonoBehaviour
         }
         if (attributesToApply.Any(e => e.Contains("fullScreenShader")))
         {
-            RandomizeFullscreenShader();
-
+            RandomizeMaterial("appliedFullScreenShader", fullScreenShaderTex, fullScreenShaders_common, fullScreenShaders_uncommon, fullScreenShaders_rare, fullScreenShaders_epic, fullScreenShaders_legendary);
         }
 
-    }
-
-    private void RandomizeFullscreenShader()
-    {
-        int fullScreenShaderSeed = UnityEngine.Random.Range(0, fullScreenShaders.Count);
-
-        fullScreenShaderTex.GetComponent<Renderer>().material = fullScreenShaders[fullScreenShaderSeed];
-
-        mainCharacter.appliedFullScreenShader = fullScreenShaders[fullScreenShaderSeed].name;
     }
 
     private void ClearAttributes()
@@ -384,16 +385,12 @@ public class AttributeRandomizer : MonoBehaviour
         int roll = UnityEngine.Random.Range(0, rngDiceSize);
         int seed;
 
-
-
         if (roll < commonThreshold)
         {
 
             seed = UnityEngine.Random.Range(0, commons.Count);
             commons[seed].SetActive(true);
             mainCharacter.setAttributeReference(attributeType, commons[seed].name);
-
-
 
         }
         else if (roll < uncommon_Threshold)
@@ -451,7 +448,6 @@ public class AttributeRandomizer : MonoBehaviour
             go.GetComponent<Renderer>().material = commons[seed];
             mainCharacter.setAttributeReference(attributeType, commons[seed].name);
 
-
         }
         else if (roll < uncommon_Threshold)
         {
@@ -487,8 +483,6 @@ public class AttributeRandomizer : MonoBehaviour
             seed = UnityEngine.Random.Range(0, legendaries.Count);
             go.GetComponent<Renderer>().material = legendaries[seed];
             mainCharacter.setAttributeReference(attributeType, legendaries[seed].name);
-
-
 
         }
 
