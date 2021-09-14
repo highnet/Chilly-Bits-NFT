@@ -84,7 +84,10 @@ public class AttributeRandomizer : MonoBehaviour
         renderNumber = 0;
         cardSetCounter = 0;
         cardStack = new Queue<GameObject>();
+<<<<<<< HEAD
         startingRenderNumber = 0;
+=======
+>>>>>>> 4dfe9e82c6a7d00ffc3a761e3cc4cefe5f6fcb2d
 
         RebuildCardStack();
 
@@ -113,7 +116,11 @@ public class AttributeRandomizer : MonoBehaviour
 
     public void BatchRender()
     {
+<<<<<<< HEAD
         renderNumber = startingRenderNumber;
+=======
+        renderNumber = 0;
+>>>>>>> 4dfe9e82c6a7d00ffc3a761e3cc4cefe5f6fcb2d
         cardSetCounter = 0;
         csvStringBuilder = new StringBuilder();
         cardStack = new Queue<GameObject>();
@@ -539,10 +546,17 @@ public class AttributeRandomizer : MonoBehaviour
 
         if (batchJobAmount >200) 
         {
+<<<<<<< HEAD
           //  Debug.Log("SAFETY MODE ON !!!");
           //  Debug.LogWarning("to render more than 200 objects turn safety mode off in code");
 
            // batchJobAmount = 200;
+=======
+            Debug.Log("SAFETY MODE ON !!!");
+            Debug.LogWarning("to render more than 200 objects turn safety mode off in code");
+
+            batchJobAmount = 200;
+>>>>>>> 4dfe9e82c6a7d00ffc3a761e3cc4cefe5f6fcb2d
         }
     }
 
