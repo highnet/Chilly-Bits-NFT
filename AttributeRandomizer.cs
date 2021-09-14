@@ -11,6 +11,7 @@ public class AttributeRandomizer : MonoBehaviour
 {
     public int rngDiceSize;
     public InputField batchAmountInput;
+    public InputField batchStartRenderInput;
     public int batchJobAmount;
     int commonThreshold = 200000;
     int uncommon_Threshold = 400000;
@@ -105,7 +106,11 @@ public class AttributeRandomizer : MonoBehaviour
     {
         string csvBufferString = csvStringBuilder.ToString();
 
-        StreamWriter writer = new StreamWriter(Application.dataPath + "/renders/log.txt" , false);
+        TimeSpan epochTicks = new TimeSpan(new DateTime(1970, 1, 1).Ticks);
+        TimeSpan unixTicks = new TimeSpan(DateTime.Now.Ticks) - epochTicks;
+        Int32 unixTimestamp = (Int32)unixTicks.TotalSeconds;
+
+        StreamWriter writer = new StreamWriter(Application.dataPath + "/renders/log" + unixTimestamp + ".txt" , false);
         using (writer)
         {
             writer.Write(csvBufferString);
@@ -560,7 +565,7 @@ public class AttributeRandomizer : MonoBehaviour
 
     public void UpdateBatchStartRenderNumberWithUI()
     {
-        string inputString = batchAmountInput.text;
+        string inputString = batchStartRenderInput.text;
         int.TryParse(inputString, out startingRenderNumber); 
     }
 
