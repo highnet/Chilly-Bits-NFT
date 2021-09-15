@@ -581,7 +581,7 @@ public class AttributeRandomizer : MonoBehaviour
                 ReplaceWeaponWithCard();
             }
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
         }
 
 
