@@ -80,7 +80,6 @@ public class Character : MonoBehaviour
                     appliedFullScreenShader = name;
                 }
                 break;
-
         }
     }
 }
